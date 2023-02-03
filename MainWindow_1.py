@@ -1,8 +1,8 @@
-import tkinter
-from tkinter import Tk, ttk
+from tkinter import Tk, ttk, filedialog
 from PrPclasses import PrP
 from Tubes_classes_27_01 import Create_Tube
 from Kclasses import Create_kalitka
+
 
 
 class Main(Tk):
@@ -30,6 +30,43 @@ class Main(Tk):
         self.sum_labl_labl = ttk.Button(self, text="Сумма").grid(column=3, row=1)
         self.sum_labl = ttk.Label(self, text="")
         self.sum_labl.grid(column=4, row=2)
+        self.save_but = ttk.Button(self, text="Сохранить", command=self.create_data)
+        self.save_but.grid(column=0, row=2)
+        self.load_but = ttk.Button(self, text="Открыть", command=self.open_data)
+        self.load_but.grid(column=1, row=2)
+
+    """нажимая кнопку сохранить я вызываю функцию, которая создаст переменную data, где будет храниться инфа
+     для сохранения. А эта Ф после выполнения  вызывет Ф save_data(data) которая и сохранит в файл информацию.
+    """
+    def create_data(self):
+        data = ""
+        for k in self.tree.get_children(""):
+            text = str(self.tree.set(k, 1))
+            amount = str(self.tree.set(k, 2))
+            price = str(self.tree.set(k, 3))
+            data = (text + ";" + amount + ";" + price + "\n")
+        self.save_data(data)
+
+
+    def save_data(self, data):
+        filepath = filedialog.asksaveasfilename(initialdir="saves")
+        if filepath != "":
+            with open(filepath, "w") as file:
+                file.write(data)
+
+
+    def open_data(self):
+        ...
+        """filepath = filedialog.askopenfile()
+        if filepath != "":
+            with open(filepath, "r") as file:
+                text = file.read()
+                self.text_editor.delete("1.0", last=END)
+                self.text_editor.insert("1.0", text)"""
+
+
+
+
         """    def func(self, *items):
         for j in items:
             self.tree.insert('', ttk.END, values=(j,))
@@ -94,6 +131,7 @@ if __name__ == "__main__":
 
 """
 https://metanit.com/python/tkinter/4.1.php - работа с таблицами
+https://metanit.com/python/tkinter/5.3.php - сохр/откр файла
 
 """
 

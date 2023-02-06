@@ -3,15 +3,14 @@ import sqlite3
 import json
 from kefy_changing import Kef_changing
 import webbrowser
-from math import ceil
-
 
 
 class Details(Toplevel):
     def __init__(self, parent, vars):
         super().__init__(parent)
         self.vars = vars
-        self.geometry("150x300")
+        self.geometry("150x350")
+
         """Раскрываем словарь, раскидываем значения по переменным"""
         self.width_1 = int(vars["Столб 1"])
         self.width_2 = int(vars["Столб 2"])
@@ -24,8 +23,10 @@ class Details(Toplevel):
         self.panel1 = int(Create_gate.null_check(vars["Панель 1"]))
         self.panel2 = int(Create_gate.null_check(vars["Панель 2"]))
         self.ugolok = int(Create_gate.null_check(vars["Уголок"]))
+        self.ushki = int(Create_gate.null_check(vars["Ушки"]))
         self.anyth = int(Create_gate.null_check(vars["Чтонть"]))
         self.ral = int(Create_gate.null_check(vars["РАЛ"]))
+        self.upory = int(Create_gate.null_check((vars["Упоры"])))
 
         """Присваиваем Label`ам эти значения и выводим на экран"""
         self.width_1_1_labl = Label(self, text="Столб №1").grid(column=0, row=0)
@@ -42,7 +43,7 @@ class Details(Toplevel):
         self.rama_2 = Label(self, text=f"{self.rama_2}")
         self.rama_2.grid(column=1, row=3)
         self.flanec_labl = Label(self, text="Фланец").grid(column=0, row=4)
-        self.flanec_pr = Label(self, text=f"{self.flanec}")
+        self.flanec_pr = Label(self, text=f"{ self.flanec}")
         self.flanec_pr.grid(column=1, row=4)
         self.kosynka_labl = Label(self, text="Косынка").grid(column=0, row=5)
         self.kosynka_pr = Label(self, text=f"{self.kosynka}")
@@ -68,24 +69,60 @@ class Details(Toplevel):
         self.ugolok_pr = Label(self, text=f"{self.ugolok}")
         self.ugolok_pr.grid(column=1, row=10)
 
-        self.anyth_labl = Label(self, text="Чтонть 1").grid(column=0, row=11)
-        self.anyth_pr = Label(self, text=f"{self.anyth}")
-        self.anyth_pr.grid(column=1, row=11)
+        self.ushki_labl = Label(self, text="Ушки").grid(column=0, row=12)
+        self.ushki_pr = Label(self, text=f"{self.ushki}")
+        self.ushki_pr.grid(column=1, row=12)
 
-        self.ral_labl = Label(self, text="РАЛ").grid(column=0, row=12)
+        self.upory_labl = Label(self, text="Упоры").grid(column=0, row=13)
+        self.upory_pr = Label(self, text=f"{self.upory}")
+        self.upory_pr.grid(column=1, row=13)
+
+        self.anyth_labl = Label(self, text="Чтонть 1").grid(column=0, row=14)
+        self.anyth_pr = Label(self, text=f"{self.anyth}")
+        self.anyth_pr.grid(column=1, row=14)
+
+        self.ral_labl = Label(self, text="РАЛ").grid(column=0, row=16)
         self.ral_pr = Label(self, text=f"{self.ral}")
-        self.ral_pr.grid(column=1, row=12)
+        self.ral_pr.grid(column=1, row=16)
+
 
     def chg_labl(self):
         self.grab_set()
         self.wait_window()
 
 
+class Density_set_class(Toplevel):
+    def __init__(self):
+        super().__init__()
+        self.labl = Label(self, text="Введи кг/м металла")
+        self.labl.pack()
+        self.met_density = Entry(self, width=11)
+        self.met_density.pack()
+        self.close_but = Button(self, text="OK", command=self.save_destr)
+        self.close_but.pack()
+
+    def density_set(self):
+        self.grab_set()  # чтоб окно получало все события и пользователь не сможет взаимодействовать с осн окном
+        self.wait_window()
+
+    """Если плотность не найдена, метод перезапишет в json, введенные с клавиатуры данные"""
+    def save_destr(self):
+        var_new_dens = self.met_density.get()
+        data_prim = Create_gate.chgtocomas(var_new_dens)
+        data = {"new_dens": data_prim}
+        self.write(data)
+        Density_set_class.destroy(self)
+
+    def write(self, data):
+        with open("new_dens.json", "w", encoding="utf-8") as file:
+            json.dump(data, file, indent=4)
+
+
 class Create_gate(Tk):
     def __init__(self):
         super().__init__()
-        # self.geometry("500x500")
-        self.title("Ворота")
+        # self.geometry("250x500")
+        self.title("Ворота распашные")
         # если например в text не указать self то этот объект создастся в окне main2
 
         """Шапка"""
@@ -98,7 +135,7 @@ class Create_gate(Tk):
         self.pricelabl = Label(self, text='Цена/т')
         self.pricelabl.grid(column=6, row=1, ipadx=11)
 
-        """Ввод высоты и ширины"""
+        """Ввод высоты и ширины (Общую, обоих створок)"""
         self.text = Label(self, text="Введи В/Ш, мм:", width=15, anchor=E)
         self.text.grid(column=0, row=0, columnspan=2)
         self.height_gate = Entry(self, width=8)
@@ -121,7 +158,7 @@ class Create_gate(Tk):
         self.tube_labl.bind("<Button-1>", lambda w0, w1=str(self.width1_1.get()),
                                                  w2=str(self.width1_2.get()): self.open_site_tube(w0, w1, w2))
         self.thick1 = Entry(self, width=8)  # толщина профиля
-        self.thick1.insert(0, "2.0")
+        self.thick1.insert(0, "2")
         self.thick1.grid(column=3, row=2)
         self.length1 = Entry(self, width=8)
         self.length1.grid(column=4, row=2)
@@ -147,7 +184,7 @@ class Create_gate(Tk):
         self.price_tube2.insert(0, "90000")
         self.price_tube2.grid(column=6, row=3, pady=5)
 
-        """Первая рама (Два row оставлены про запас"""
+        """Первая рама (Два row оставлены прозапас)"""
         self.rama_labl = Label(self, text='Рама', cursor="hand2", foreground="#1b12c4")
         self.rama_labl.grid(column=0, row=6)
 
@@ -255,19 +292,42 @@ class Create_gate(Tk):
         self.ug_price = Entry(self, width=8)
         self.ug_price.grid(column=6, row=16)
 
-        """Что-нибудь"""
-        self.any_labl = Label(self, width=9, text="....", anchor=W).grid(column=0, row=17)
-        self.any_size = Entry(self, width=11)
-        self.any_size.grid(column=3, row=17, columnspan=2, sticky=E, padx=6)
-        self.any_amount = Entry(self, width=8)
-        self.any_amount.grid(column=5, row=17)
-        self.any_price = Entry(self, width=8)
-        self.any_price.grid(column=6, row=17)
+        """Ушки"""
+        self.ush_labl = Label(self, width=9, text="Ушки", anchor=W).grid(column=0, row=17)
+        self.ush_size = Entry(self, width=11)
+        self.ush_size.grid(column=3, row=17, columnspan=2, sticky=E, padx=6)
+        self.ush_amount = Entry(self, width=8)
+        self.ush_amount.grid(column=5, row=17)
+        self.ush_amount.insert(0, "2")
+        self.ush_price = Entry(self, width=8)
+        self.ush_price.grid(column=6, row=17)
+
+        """Упоры в землю"""
+        self.upor_labl = Label(self, width=9, text="Упоры", anchor=W).grid(column=0, row=18)
+        self.upor_size = Entry(self, width=11)
+        self.upor_size.grid(column=3, row=18, columnspan=2, sticky=E, padx=6)
+        self.upor_amount = Entry(self, width=8)
+        self.upor_amount.grid(column=5, row=18)
+        self.upor_amount.insert(0, "2")
+        self.upor_price = Entry(self, width=8)
+        self.upor_price.grid(column=6, row=18)
 
         """РАЛ"""
-        self.ral_labl = Label(self, text="Краска", width=9, anchor=W).grid(column=0, row=18)
+        self.ral_labl = Label(self, text="Краска", width=9, anchor=W).grid(column=0, row=19)
         self.ral_price = Entry(self, width=8)
-        self.ral_price.grid(column=6, row=18)
+        self.ral_price.grid(column=6, row=19)
+        self.ral_amount = Entry(self, width=8)
+        self.ral_amount.grid(column=5, row=19)
+        self.ral_amount.insert(0, "1")
+
+        """Что-нибудь"""
+        self.any_labl = Label(self, width=9, text="....", anchor=W).grid(column=0, row=20)
+        self.any_size = Entry(self, width=11)
+        self.any_size.grid(column=3, row=20, columnspan=2, sticky=E, padx=6)
+        self.any_amount = Entry(self, width=8)
+        self.any_amount.grid(column=5, row=20)
+        self.any_price = Entry(self, width=8)
+        self.any_price.grid(column=6, row=20)
 
         """Вывод результата расчета"""
         self.summa_text = Label(self)
@@ -299,6 +359,7 @@ class Create_gate(Tk):
         baz = foo + w1 + bar + w2
         webbrowser.open(baz)
 
+    """Детали расчета"""
     def details(self):
         window = Details(self, vars)
         window.chg_labl()
@@ -308,13 +369,12 @@ class Create_gate(Tk):
         window = Kef_changing()
         a = window.open()
 
-    """Ф заменяет точки на запятую у толщин металлов, только у них. 
-    В остальных случаях значение после запятой отбрасывается"""
-
+    """Ф заменяет точки на запятую у толщин металлов, только у них"""
     @staticmethod
     def chgtocomas(foo):
         return foo.replace(",", ".")
 
+    """Прочтение json файла"""
     def read(self, filename):
         with open(filename, "r", encoding="utf-8") as file:
             return json.load(file)
@@ -322,7 +382,7 @@ class Create_gate(Tk):
     """Извлекаем данные из БД"""
     def database(self, width1, width2, thick):
         try:
-            sqlite_connection = sqlite3.connect('dens_db.db')
+            sqlite_connection = sqlite3.connect('denstest6rows.db')
             cursor = sqlite_connection.cursor()
             sqlite_select_query = (f"""
                                         SELECT Density from test where Width={width1} 
@@ -340,6 +400,8 @@ class Create_gate(Tk):
             return 0
 
         except UnboundLocalError:
+            window = Density_set_class()
+            window.density_set()
             return float(self.read("new_dens.json")["new_dens"])
 
         finally:
@@ -394,19 +456,21 @@ class Create_gate(Tk):
         panel_1 = int(self.null_check(self.panel_price.get()) * self.null_check(self.panel_amount.get()))
         panel_2 = int(self.null_check(self.panel_price2.get()) * self.null_check(self.panel_amount2.get()))
         ugolok = int(self.null_check(self.ug_price.get()) * self.null_check(self.ug_amount.get()))
+        upory = int(self.null_check(self.upor_price.get()) * self.null_check(self.upor_amount.get()))
         anyth = int(self.null_check(self.any_price.get()) * self.null_check(self.any_amount.get()))
-        ral = int((
-                int(self.ral_price.get()) * int(self.height_gate.get()) * int(self.width_gate.get()) / 1000000 * 0.2
-                   ))
+        ushki = int(self.null_check(self.ush_amount.get()) * self.null_check(self.ush_price.get()))
+        ral = int((int(self.ral_price.get()) * int(self.height_gate.get()) * int(self.width_gate.get()) / 1_000_000
+              * 0.2) * int(self.ral_amount.get()))
+
 
         """Создаем переменную vars для передачи словаря в окно Детали расчета"""
         vars = {"Столб 1": cena_tube_1, "Столб 2": cena_tube_2, "Рама 1": cena_ramy_1, "Рама 2": cena_ramy_2,
                 "Фланец": flanec, "Косынка": kosynka, "Шарнир": sharnir,
                 "Заглушка": zagl, "Панель 1": panel_1, "Панель 2": panel_2,
-                "Уголок": ugolok, "Чтонть": anyth, "РАЛ": ral}
+                "Уголок": ugolok, "Ушки": ushki, "Чтонть": anyth, "РАЛ": ral, "Упоры": upory}
 
         """Расчет стоимости остального"""
-        cena_stuff = (flanec + kosynka + sharnir + zagl + panel_1 + panel_2 + ugolok + anyth + ral)
+        cena_stuff = (flanec + kosynka + sharnir + zagl + panel_1 + panel_2 + ugolok + anyth + ral + ushki + upory)
 
         """расчет итоговых значений"""
         summa = cena_stuff + cena_ramy_2 + cena_ramy_1 + cena_tube_2 + cena_tube_1
@@ -418,32 +482,24 @@ class Create_gate(Tk):
         self.summa_sale_text.config(text=f"{summa_k_sale}")
         self.summa_text.config(text=f"{summa}")
 
-    """Начальное заполнение окон по нажатию кнопки. Если одна из сторон больше 2,4м то толщина столба 3"""
+    """Начальное заполнение окон по нажатию кнопки"""
     def to_fill(self):
         height = int(self.height_gate.get())
-        height1000 = height + 1000
+        height1000 = height+1000
         width = int(self.width_gate.get())
-        width_stvorki = width / 2
         ukosina = 0
-
-        if height > 2399 or width > 4798:
-            """1. Удалить старое значение. Ввести новое"""
+        """Если длина/высота створки > 2400, то толщина опоры 3мм, добавляется укосина"""
+        if height > 2499 or width/2 > 2499:
             self.thick1.delete(0, last=END)
-            self.thick1.insert(0, "3.0")
-            """укосина - делим на 100, возводим в сил и умножаем на 100, чтоб округлить 3230 до 3300"""
-            ukosina = ceil(((height ** 2 + width_stvorki ** 2) ** 0.5) / 100) * 100
-            rama_amount = height * 4 + width * 2 + ukosina * 2
-            self.dlina_ramy_1.delete(0, last=END)
-            self.dlina_ramy_1.insert(0, f"{rama_amount}")
-        else:
-            rama_amount = height * 4 + width * 2
-            self.dlina_ramy_1.delete(0, last=END)
-            self.dlina_ramy_1.insert(0, f"{rama_amount}")
-            self.length1.delete(0, last=END)
-            self.length1.insert(0, f"{height1000 * 2}")
+            self.thick1.insert(0, "3")
+            ukosina = int((height**2 + width/2 ** 2) ** 0.5)
 
         self.length1.delete(0, last=END)
-        self.length1.insert(0, f"{height1000 * 2}")
+        self.length1.insert(0, "{}".format(height1000))
+
+        dlina_ramy = height * 4 + width * 2 + ukosina * 2
+        self.dlina_ramy_1.delete(0, last=END)
+        self.dlina_ramy_1.insert(0, "{}".format(dlina_ramy))
 
         w1_1 = int(self.width1_1.get())
         w1_2 = int(self.width1_2.get())
@@ -461,7 +517,7 @@ class Create_gate(Tk):
 
         """Заполнение строки Заглушка. Если такой заглушки в БД нет, удалит существующие записи в строке"""
         try:
-            zaglushka = self.read("kalitka_kefyy.json")["zaglushki"][f"{str(self.width1_1.get())}x{str(self.width1_2.get())}"]
+            zaglushka = self.read("kalitka_kefyy.json")["zaglushki"][f"{str(w1_1)}x{str(w1_2)}"]
             self.zagl_price.delete(0, last=END)
             self.zagl_price.insert(0, f"{zaglushka}")
             self.zagl_size.delete(0, last=END)
@@ -477,22 +533,56 @@ class Create_gate(Tk):
         self.ral_price.insert(0, f"{ral}")
 
         """Загружаем с json цену косынки"""
-        cena = self.read("kalitka_kefyy.json")["price"]["kosynka"]
+        """cena = self.read("kalitka_kefyy.json")["price"]["kosynka"]
         self.kosynka_price.delete(0, last=END)
-        self.kosynka_price.insert(0, f"{cena}")
+        self.kosynka_price.insert(0, f"{cena}")"""
 
         """Загружаем с json цену шарнира"""
         cena = self.read("kalitka_kefyy.json")["price"]["sharnir"]
         self.sharnir_price.delete(0, last=END)
         self.sharnir_price.insert(0, f"{cena}")
 
+        """Загружаем с json цену ушек"""
+        cena = self.read("kalitka_kefyy.json")["price"]["ushki"]
+        self.ush_price.delete(0, last=END)
+        self.ush_price.insert(0, f"{cena}")
+
+        """Загружаем с json цену упоров в землю"""
+        cena = self.read("kalitka_kefyy.json")["price"]["upory"]
+        self.upor_price.delete(0, last=END)
+        self.upor_price.insert(0, f"{cena}")
 
 if __name__ == "__main__":
     a = Create_gate()
     a.mainloop()
 
 
-"""1. Упоры в землю 
-2. ушки
-3. Не считает металлы
+
+""" Что добавить в таблицу
+1. На данный момент программа работает только с профильными трубами, добавить круглые
+2. Сохранять историю расчетов до закрытия программы
+3. 
+
+
+
+Теперь любые ошибки в sql игнорируются, потому что я все заменяю на 0
+Как к этому пришле:
+ 1. Ф count не может рассчитать стоимость потому что поступает:
+     ValueError: invalid literal for int() with base 10: ''
+2. Для лечения выставил по умолчанию в позициях значения 0 (толщина, длина, кол-во)
+3. Получаю ошибку UnboundLocalError: local variable 'a' referenced before assignment т.к. line 45, in database
+return a.     ----------ПОЧИНЕНО
+4. Для многооконной программы используется Tk в качестве основного окна и Toplevel для всех остальных. 
+5. Поправить расчет количества рамы при расчете калитки с добором
+6. ЗДесь извлечение данных сделано отлично от расчета труб. Здесь я передаю в базу данных не число 0, а '' строку, 
+отсюда ошибки, отсюда обработка ошибок
+7. acnchor работает только в паре с width=
+
+
+
+Тогда вам надо будет использовать mainloop только один раз 
+
+
+
 """
+

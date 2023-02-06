@@ -9,7 +9,7 @@ class Details(Toplevel):
     def __init__(self, parent, vars):
         super().__init__(parent)
         self.vars = vars
-        self.geometry("100x300")
+        self.geometry("150x300")
 
         """Раскрываем словарь, раскидываем значения по переменным"""
         self.width_1 = int(vars["Столб 1"])
@@ -23,6 +23,7 @@ class Details(Toplevel):
         self.panel1 = int(Create_kalitka.null_check(vars["Панель 1"]))
         self.panel2 = int(Create_kalitka.null_check(vars["Панель 2"]))
         self.ugolok = int(Create_kalitka.null_check(vars["Уголок"]))
+        self.ushki = int(Create_kalitka.null_check(vars["Ушки"]))
         self.anyth = int(Create_kalitka.null_check(vars["Чтонть"]))
         self.ral = int(Create_kalitka.null_check(vars["РАЛ"]))
 
@@ -67,13 +68,17 @@ class Details(Toplevel):
         self.ugolok_pr = Label(self, text=f"{self.ugolok}")
         self.ugolok_pr.grid(column=1, row=10)
 
-        self.anyth_labl = Label(self, text="Чтонть 1").grid(column=0, row=11)
-        self.anyth_pr = Label(self, text=f"{self.anyth}")
-        self.anyth_pr.grid(column=1, row=11)
+        self.ushki_labl = Label(self, text="Ушки").grid(column=0, row=12)
+        self.ushki_pr = Label(self, text=f"{self.ushki}")
+        self.ushki_pr.grid(column=1, row=12)
 
-        self.ral_labl = Label(self, text="РАЛ").grid(column=0, row=12)
+        self.anyth_labl = Label(self, text="Чтонть 1").grid(column=0, row=14)
+        self.anyth_pr = Label(self, text=f"{self.anyth}")
+        self.anyth_pr.grid(column=1, row=14)
+
+        self.ral_labl = Label(self, text="РАЛ").grid(column=0, row=16)
         self.ral_pr = Label(self, text=f"{self.ral}")
-        self.ral_pr.grid(column=1, row=12)
+        self.ral_pr.grid(column=1, row=16)
 
     def chg_labl(self):
         self.grab_set()
@@ -281,19 +286,33 @@ class Create_kalitka(Tk):
         self.ug_price = Entry(self, width=8)
         self.ug_price.grid(column=6, row=16)
 
-        """Что-нибудь"""
-        self.any_labl = Label(self, width=9, text="....", anchor=W).grid(column=0, row=17)
-        self.any_size = Entry(self, width=11)
-        self.any_size.grid(column=3, row=17, columnspan=2, sticky=E, padx=6)
-        self.any_amount = Entry(self, width=8)
-        self.any_amount.grid(column=5, row=17)
-        self.any_price = Entry(self, width=8)
-        self.any_price.grid(column=6, row=17)
+        """Ушки"""
+        self.ush_labl = Label(self, width=9, text="Ушки", anchor=W).grid(column=0, row=17)
+        self.ush_size = Entry(self, width=11)
+        self.ush_size.grid(column=3, row=17, columnspan=2, sticky=E, padx=6)
+        self.ush_amount = Entry(self, width=8)
+        self.ush_amount.grid(column=5, row=17)
+        self.ush_amount.insert(0, "2")
+        self.ush_price = Entry(self, width=8)
+        self.ush_price.grid(column=6, row=17)
+        # self.
 
         """РАЛ"""
-        self.ral_labl = Label(self, text="Краска", width=9, anchor=W).grid(column=0, row=18)
+        self.ral_labl = Label(self, text="Краска", width=9, anchor=W).grid(column=0, row=19)
         self.ral_price = Entry(self, width=8)
-        self.ral_price.grid(column=6, row=18)
+        self.ral_price.grid(column=6, row=19)
+        self.ral_amount = Entry(self, width=8)
+        self.ral_amount.grid(column=5, row=19)
+        self.ral_amount.insert(0, "1")
+
+        """Что-нибудь"""
+        self.any_labl = Label(self, width=9, text="....", anchor=W).grid(column=0, row=20)
+        self.any_size = Entry(self, width=11)
+        self.any_size.grid(column=3, row=20, columnspan=2, sticky=E, padx=6)
+        self.any_amount = Entry(self, width=8)
+        self.any_amount.grid(column=5, row=20)
+        self.any_price = Entry(self, width=8)
+        self.any_price.grid(column=6, row=20)
 
         """Вывод результата расчета"""
         self.summa_text = Label(self)
@@ -423,17 +442,18 @@ class Create_kalitka(Tk):
         panel_2 = int(self.null_check(self.panel_price2.get()) * self.null_check(self.panel_amount2.get()))
         ugolok = int(self.null_check(self.ug_price.get()) * self.null_check(self.ug_amount.get()))
         anyth = int(self.null_check(self.any_price.get()) * self.null_check(self.any_amount.get()))
+        ushki = int(self.null_check(self.ush_amount.get()) * self.null_check(self.ush_price.get()))
         ral = int((int(self.ral_price.get()) * int(self.height_kalitki.get()) * int(self.width_kalitki.get()) / 1_000_000
-              * 0.2))
+              * 0.2) * int(self.ral_amount.get()))
 
         """Создаем переменную vars для передачи словаря в окно Детали расчета"""
         vars = {"Столб 1": cena_tube_1, "Столб 2": cena_tube_2, "Рама 1": cena_ramy_1, "Рама 2": cena_ramy_2,
                 "Фланец": flanec, "Косынка": kosynka, "Шарнир": sharnir,
                 "Заглушка": zagl, "Панель 1": panel_1, "Панель 2": panel_2,
-                "Уголок": ugolok, "Чтонть": anyth, "РАЛ": ral}
+                "Уголок": ugolok, "Ушки": ushki, "Чтонть": anyth, "РАЛ": ral}
 
         """Расчет стоимости остального"""
-        cena_stuff = (flanec + kosynka + sharnir + zagl + panel_1 + panel_2 + ugolok + anyth + ral)
+        cena_stuff = (flanec + kosynka + sharnir + zagl + panel_1 + panel_2 + ugolok + anyth + ral + ushki)
 
         """расчет итоговых значений"""
 
@@ -498,14 +518,22 @@ class Create_kalitka(Tk):
         # сначала заполняю размер калитки и профили столбов, потом жмут заполнить
 
         """Загружаем с json цену косынки"""
-        cena = self.read("kalitka_kefyy.json")["price"]["kosynka"]
-        self.kosynka_price.delete(0, last=END)
-        self.kosynka_price.insert(0, f"{cena}")
+        # cena = self.read("kalitka_kefyy.json")["price"]["kosynka"]
+        # self.kosynka_price.delete(0, last=END)
+        # self.kosynka_price.insert(0, f"{cena}")
 
         """Загружаем с json цену шарнира"""
         cena = self.read("kalitka_kefyy.json")["price"]["sharnir"]
         self.sharnir_price.delete(0, last=END)
         self.sharnir_price.insert(0, f"{cena}")
+
+        """Загружаем с json цену ушек"""
+        cena = self.read("kalitka_kefyy.json")["price"]["ushki"]
+        self.ush_price.delete(0, last=END)
+        self.ush_price.insert(0, f"{cena}")
+
+        """Загружаем с json цену упоров в землю"""
+        cena = self.read("kalitka_kefyy.json")["price"]["upory"]
 
 
 if __name__ == "__main__":
@@ -514,13 +542,11 @@ if __name__ == "__main__":
 
 
 
-"""1. Ушки
-2. acnchor работает только в паре с width=
-3. Добавлять еще КЭФы к расчету
-4. Добавить окно ввода плотности. Невозможно учесть все варинты профилей в БД
-5. На данный момент программа работает только с профильными трубами, добавить круглые
-6. Сохранять историю расчетов до закрытия программы
-7. Обнулить таблицу
+""" Что добавить в таблицу
+1. На данный момент программа работает только с профильными трубами, добавить круглые
+2. Сохранять историю расчетов до закрытия программы
+3. 
+
 
 
 Теперь любые ошибки в sql игнорируются, потому что я все заменяю на 0
@@ -534,6 +560,7 @@ return a.     ----------ПОЧИНЕНО
 5. Поправить расчет количества рамы при расчете калитки с добором
 6. ЗДесь извлечение данных сделано отлично от расчета труб. Здесь я передаю в базу данных не число 0, а '' строку, 
 отсюда ошибки, отсюда обработка ошибок
+7. acnchor работает только в паре с width=
 
 
 

@@ -3,8 +3,6 @@ from PrPclasses import PrP
 from Tubes_classes_27_01 import Create_Tube
 from Kclasses import Create_kalitka
 
-
-
 class Main(Tk):
     def __init__(self):
         super().__init__()
@@ -19,7 +17,7 @@ class Main(Tk):
         self.tree.column('3', minwidth=70, width=70, )
         self.tree.grid(column=0, row=0, columnspan=6)
 
-        self.addPrP = ttk.Button(self, text='ПрП', command=self.start_prp, width=5)
+        self.addPrP = ttk.Button(self, text='ПрП', command=self.start_prp, width=11)
         self.addPrP.grid(column=0, row=1)
         self.addTubes = ttk.Button(self, text='Трубы', command=self.start_tubes)
         self.addTubes.grid(column=1, row=1)
@@ -27,10 +25,10 @@ class Main(Tk):
         self.addKalitka.grid(column=2, row=1)
         self.del_but = ttk.Button(self, text="Удалить", command=self.del_func).grid(column=3, row=1)
         self.sum_but = ttk.Button(self, text="Сумма", command=self.sum_func).grid(column=4, row=1)
-        self.sum_labl_labl = ttk.Button(self, text="Сумма").grid(column=3, row=1)
+        # self.sum_labl_labl = ttk.Button(self, text="Сумма").grid(column=3, row=1)
         self.sum_labl = ttk.Label(self, text="")
         self.sum_labl.grid(column=4, row=2)
-        self.save_but = ttk.Button(self, text="Сохранить", command=self.create_data)
+        self.save_but = ttk.Button(self, text="Сохранить", width=11, command=self.create_data)
         self.save_but.grid(column=0, row=2)
         self.load_but = ttk.Button(self, text="Открыть", command=self.open_data)
         self.load_but.grid(column=1, row=2)
@@ -44,27 +42,32 @@ class Main(Tk):
             text = str(self.tree.set(k, 1))
             amount = str(self.tree.set(k, 2))
             price = str(self.tree.set(k, 3))
-            data = (text + ";" + amount + ";" + price + "\n")
+            data_add = (text + ";" + amount + ";" + price + "\n")
+            data += data_add
         self.save_data(data)
 
-
+    """Сохраняем расчеты в файл"""
     def save_data(self, data):
         filepath = filedialog.asksaveasfilename(initialdir="saves")
         if filepath != "":
             with open(filepath, "w") as file:
                 file.write(data)
 
-
+    """По кнопке Открыть загружаем дату из saves"""
     def open_data(self):
-        ...
-        """filepath = filedialog.askopenfile()
+        filepath = filedialog.askopenfilename(initialdir="saves")
         if filepath != "":
-            with open(filepath, "r") as file:
-                text = file.read()
-                self.text_editor.delete("1.0", last=END)
-                self.text_editor.insert("1.0", text)"""
+            with open(filepath) as file:
+                data = file.readlines()  # считывает из файлы все строки в список и возвращает его
+        self.put_data(data)
 
-
+    """Передаем загруженную дату в Ф, которая заполнит таблицу начального экрана"""
+    def put_data(self, data):
+        for info in data:
+            text, amount, price = info.rstrip("\n").split(";")
+            data_insert = [text, amount, price]
+            self.tree.insert('', 'end', values=data_insert)
+            self.tree.config(height=len(self.tree.get_children()))
 
 
         """    def func(self, *items):

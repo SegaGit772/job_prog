@@ -48,8 +48,9 @@ class Kef_changing(Toplevel):
         self.kalitka_kef_seb_input.set(self.kalitka_kef_seb_get)
         self.kalitka_seb = Spinbox(self, from_=0.00, to=111.00, width=7, increment=0.01, textvariable=self.kalitka_kef_seb_input)
         self.kalitka_seb.grid(column=1, row=5)
+
         """КЭФ продажи калитки"""
-        self.kalitka_kef_sale_get = read('kalitka_kefy.json')["kalitka"]["sale"]
+        self.kalitka_kef_sale_get = read('kalitka_kefyy.json')["kefy"]["kalitka"]["sale"]
         self.kalitka_kef_sale_input = DoubleVar()
         self.kalitka_kef_sale_input.set(self.kalitka_kef_sale_get)
         self.kalitka_sale = Spinbox(self, from_=0, to=111, width=7, increment=0.01, textvariable=self.kalitka_kef_sale_input)
@@ -101,7 +102,7 @@ class Kef_changing(Toplevel):
 
         """Стоимость косынки"""
         self.kosynka_labl = Label(self, text="Косынка").grid(column=0, row=15)
-        self.kosynka_price_get = read('kalitka_kefy.json')["kalitka"]["kosynka"]
+        self.kosynka_price_get = read('kalitka_kefyy.json')["price"]["kosynka"]
         self.kosynka_price_input = IntVar()
         self.kosynka_price_input.set(self.kosynka_price_get)
         self.kosynka_price = Spinbox(self, from_=0, to=10000, width=7, textvariable=self.kosynka_price_input)

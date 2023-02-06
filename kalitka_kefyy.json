@@ -40,7 +40,9 @@
     "price": {
         "kosynka": 13.3,
         "sharnir": 680,
-        "ral": 370
+        "ral": 370,
+	"upory": 350, 
+	"ushki": 55
     },
     "zaglushki": {
         "40x20": 3,

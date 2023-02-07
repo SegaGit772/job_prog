@@ -2,6 +2,7 @@ from tkinter import Tk, ttk, filedialog
 from PrPclasses import PrP
 from Tubes_classes_27_01 import Create_Tube
 from Kclasses import Create_kalitka
+from GateClasses import Create_gate
 
 class Main(Tk):
     def __init__(self):
@@ -23,8 +24,11 @@ class Main(Tk):
         self.addTubes.grid(column=1, row=1)
         self.addKalitka = ttk.Button(self, text="Калитка", command=self.start_kalitka)
         self.addKalitka.grid(column=2, row=1)
-        self.del_but = ttk.Button(self, text="Удалить", command=self.del_func).grid(column=3, row=1)
-        self.sum_but = ttk.Button(self, text="Сумма", command=self.sum_func).grid(column=4, row=1)
+        self.addvr = ttk.Button(self, text="Калитка", command=self.start_vr)
+        self.addvr.grid(column=3, row=2)
+
+        self.del_but = ttk.Button(self, text="Удалить", command=self.del_func).grid(column=4, row=1)
+        self.sum_but = ttk.Button(self, text="Сумма", command=self.sum_func).grid(column=5, row=1)
         # self.sum_labl_labl = ttk.Button(self, text="Сумма").grid(column=3, row=1)
         self.sum_labl = ttk.Label(self, text="")
         self.sum_labl.grid(column=4, row=2)
@@ -120,6 +124,9 @@ class Main(Tk):
                    "flanec": flanec_name, "kosynka": kosynka_name,
                    "combo_w_2": combo_w_2, "width2_1": width2_1, "width2_2": width2_2, "thick2": thickness2}"""
 
+    def start_vr(self):
+        a = Create_gate()
+        tbs = a.open()
 
 
     def start_kalitka(self):

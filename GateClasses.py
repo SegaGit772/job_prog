@@ -378,6 +378,11 @@ class Create_gate(Tk):
             self.flanec_size.delete(0, last=END)
             self.flanec_size.insert(0, "200x200x5")
 
+    def open(self):
+        self.grab_set()
+        self.wait_window()
+        return results
+
     def open_site_tube(self, event, w1, w2):
         foo = "https://www.spk.ru/catalog/metalloprokat/trubniy-prokat/truba-profilnaya/?rt02[]="
         bar = "&rt03[]="
@@ -458,7 +463,7 @@ class Create_gate(Tk):
 
     def count(self):
         """Расчет стоимости столбов. Try обрабатывает событие если поступает '' пустой значение"""
-        global vars
+        global vars, results
 
         cena_tube_1 = (int(
             (self.database(str(self.width1_1.get()), str(self.width1_2.get()), self.chgtocomas(str(self.thick1.get()))))
@@ -590,6 +595,8 @@ class Create_gate(Tk):
         cena = self.read("kalitka_kefyy.json")["price"]["upory"]
         self.upor_price.delete(0, last=END)
         self.upor_price.insert(0, f"{cena}")
+
+        results = {}
 
 if __name__ == "__main__":
     a = Create_gate()

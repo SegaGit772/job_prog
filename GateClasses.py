@@ -3,6 +3,7 @@ import sqlite3
 import json
 from kefy_changing import Kef_changing
 import webbrowser
+from math import ceil
 
 
 class Details(Toplevel):
@@ -85,7 +86,6 @@ class Details(Toplevel):
         self.ral_pr = Label(self, text=f"{self.ral}")
         self.ral_pr.grid(column=1, row=16)
 
-
     def chg_labl(self):
         self.grab_set()
         self.wait_window()
@@ -131,7 +131,7 @@ class Create_gate(Tk):
         self.width3_labl = Label(self, text='Толщина').grid(column=3, row=1)
         self.length1_labl = Label(self, text='Длина,мм').grid(column=4, row=1)
         self.amounttubelabl = Label(self, text="Кол-во")
-        self.amounttubelabl.grid(column=5, row=1, ipadx=5, ipady=0)  # отсутпы наебашить. если ___.grid то объект возвращает нан и ipad не работает
+        self.amounttubelabl.grid(column=5, row=1, ipadx=5, ipady=0)
         self.pricelabl = Label(self, text='Цена/т')
         self.pricelabl.grid(column=6, row=1, ipadx=11)
 
@@ -152,9 +152,11 @@ class Create_gate(Tk):
         self.width1_1 = Entry(self, width=8)  # Большая сторона профиля
         self.width1_1.insert(0, '80')
         self.width1_1.grid(column=1, row=2)
+        self.width1_1.bind('<FocusOut>', self.zagl_set)  # "<Tab>" "<FocusOut>"
         self.width1_2 = Entry(self, width=8)  # Меньшая сторона профиля
         self.width1_2.insert(0, "80")
         self.width1_2.grid(column=2, row=2)
+        self.width1_2.bind("<FocusOut>", self.zagl_set)
         self.tube_labl.bind("<Button-1>", lambda w0, w1=str(self.width1_1.get()),
                                                  w2=str(self.width1_2.get()): self.open_site_tube(w0, w1, w2))
         self.thick1 = Entry(self, width=8)  # толщина профиля
@@ -348,10 +350,32 @@ class Create_gate(Tk):
         """Кнопки Расчет, Детали расчета и Изменить КЭФы"""
         self.count_but = Button(self, text="Рассчитать", width=13, command=self.count)
         self.count_but.grid(column=2, columnspan=2, row=21)
-        self.count_det_but = Button(self, width=13, text="Детали расчета",  command=self.details, state="active") # disabled
+        self.count_det_but = Button(self, width=13, text="Детали расчета",  command=self.details, state="active")
         self.count_det_but.grid(column=2, columnspan=2, row=22)
         self.change_kefy = Button(self, width=13, text="Изменить КЭФы", command=self.kefy)
         self.change_kefy.grid(column=2, columnspan=2, row=23)
+
+    """Ф устанавливает размер и цену заглушки под профиль столба"""
+    def zagl_set(self, event):
+        width1 = int(self.width1_1.get())
+        width2 = int(self.width1_2.get())
+        self.zagl_size.delete(0, last=END)
+        self.zagl_size.insert(0, f"{width1}x{width2}")
+        if width1 > 80 or width2 > 80:
+            self.price_tube1.delete(0, last=END)
+            self.price_tube1.insert(0, "110000")
+        """ Ф установит цену заглушки"""
+        self.zagl_price_set(width1, width2)
+        self.flanec_set(width1, width2)
+
+    """Ф устанавливает размер фланца под профиль столба"""
+    def flanec_set(self, w1, w2):
+        if w1 == 60 and w2 == 60:
+            self.flanec_size.delete(0, last=END)
+            self.flanec_size.insert(0, "150x150x5")
+        elif w1 >= 60 and w1 <= 100 and w2 >=60 and w2 <= 100:
+            self.flanec_size.delete(0, last=END)
+            self.flanec_size.insert(0, "200x200x5")
 
     def open_site_tube(self, event, w1, w2):
         foo = "https://www.spk.ru/catalog/metalloprokat/trubniy-prokat/truba-profilnaya/?rt02[]="
@@ -381,6 +405,7 @@ class Create_gate(Tk):
 
     """Извлекаем данные из БД"""
     def database(self, width1, width2, thick):
+        density = 0
         try:
             sqlite_connection = sqlite3.connect('denstest6rows.db')
             cursor = sqlite_connection.cursor()
@@ -416,6 +441,19 @@ class Create_gate(Tk):
             return float(foo)
         except:
             return 0
+
+    def zagl_price_set(self, w1, w2):
+        """Заполнение строки Заглушка. Если такой заглушки в БД нет, удалит существующие записи в строке"""
+        try:
+            zaglushka = self.read("kalitka_kefyy.json")["zaglushki"][f"{str(w1)}x{str(w2)}"]
+            self.zagl_price.delete(0, last=END)
+            self.zagl_price.insert(0, f"{zaglushka}")
+            self.zagl_size.delete(0, last=END)
+            self.zagl_size.insert(0, f"{w1}x{w2}")
+        except KeyError:
+            self.zagl_price.delete(0, last=END)
+            self.zagl_size.delete(0, last=END)
+            self.zagl_amount.delete(0, last=END)
 
     def count(self):
         """Расчет стоимости столбов. Try обрабатывает событие если поступает '' пустой значение"""
@@ -489,11 +527,12 @@ class Create_gate(Tk):
         width = int(self.width_gate.get())
         ukosina = 0
         """Если длина/высота створки > 2400, то толщина опоры 3мм, добавляется укосина"""
-        if height > 2499 or width/2 > 2499:
+        if height > 2399 or width/2 > 2399:
             self.thick1.delete(0, last=END)
             self.thick1.insert(0, "3")
-            ukosina = int((height**2 + width/2 ** 2) ** 0.5)
-
+            ukosina = int((ceil((height ** 2 + (width / 2) ** 2) ** 0.5 / 100)) * 100)
+            # ukosina = int(ceil((height**2 + width/2 ** 2) ** 0.5 * 10) / 10)
+            print(ukosina)
         self.length1.delete(0, last=END)
         self.length1.insert(0, "{}".format(height1000))
 
@@ -509,8 +548,7 @@ class Create_gate(Tk):
         elif w1_1 in [60, 80] and w1_2 in [60, 80]:
             self.flanec_size.delete(0, last=END)
             self.flanec_size.insert(0, "200x200x5")
-        else:
-            None
+
         height__30 = (height-70)    # height__30 - высота панели
         self.panel_size.delete(0, last=END)
         self.panel_size.insert(0, "{}х".format(height__30))  # разобраться с автозаполнением панелей

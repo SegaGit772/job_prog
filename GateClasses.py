@@ -356,17 +356,18 @@ class Create_gate(Tk):
         self.change_kefy.grid(column=2, columnspan=2, row=23)
 
     """Ф устанавливает размер и цену заглушки под профиль столба"""
-    def zagl_set(self, event):
-        width1 = int(self.width1_1.get())
-        width2 = int(self.width1_2.get())
-        self.zagl_size.delete(0, last=END)
-        self.zagl_size.insert(0, f"{width1}x{width2}")
+    @staticmethod
+    def zagl_set(event):
+        width1 = int(a.width1_1.get())
+        width2 = int(a.width1_2.get())
+        a.zagl_size.delete(0, last=END)
+        a.zagl_size.insert(0, f"{width1}x{width2}")
         if width1 > 80 or width2 > 80:
-            self.price_tube1.delete(0, last=END)
-            self.price_tube1.insert(0, "110000")
+            a.price_tube1.delete(0, last=END)
+            a.price_tube1.insert(0, "110000")
         """ Ф установит цену заглушки"""
-        self.zagl_price_set(width1, width2)
-        self.flanec_set(width1, width2)
+        a.zagl_price_set(width1, width2)
+        a.flanec_set(width1, width2)
 
     """Ф устанавливает размер фланца под профиль столба"""
     def flanec_set(self, w1, w2):

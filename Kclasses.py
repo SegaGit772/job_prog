@@ -146,9 +146,11 @@ class Create_kalitka(Tk):
         self.width1_1 = Entry(self, width=8)  # Большая сторона профиля
         self.width1_1.insert(0, '60')
         self.width1_1.grid(column=1, row=2)
+        self.width1_1.bind("<FocusOut>", self.zagl_set)
         self.width1_2 = Entry(self, width=8)  # Меньшая сторона профиля
         self.width1_2.insert(0, "60")
         self.width1_2.grid(column=2, row=2)
+        self.width1_2.bind("<FocusOut>", self.zagl_set)
         self.tube_labl.bind("<Button-1>", lambda w0, w1=str(self.width1_1.get()),
                                                  w2=str(self.width1_2.get()): self.open_site_tube(w0, w1, w2))
         self.thick1 = Entry(self, width=8)  # толщина профиля
@@ -337,6 +339,37 @@ class Create_kalitka(Tk):
         self.count_det_but.grid(column=2, columnspan=2, row=22)
         self.change_kefy = Button(self, width=13, text="Изменить КЭФы", command=self.kefy)
         self.change_kefy.grid(column=2, columnspan=2, row=23)
+
+    def zagl_set(self, event):
+        width1 = int(self.width1_1.get())
+        width2 = int(self.width1_2.get())
+        self.zagl_size.delete(0, last=END)
+        self.zagl_size.insert(0, f"{width1}x{width2}")
+        if width1 > 80 or width2 > 80:
+            self.price_tube1.delete(0, last=END)
+            self.price_tube1.insert(0, "110000")
+        self.zagl_price_set(width1, width2)
+        self.flanec_set(width1, width2)
+
+    def flanec_set(self, w1, w2):
+        if w1 == 60 and w2 == 60:
+            self.flanec_size.delete(0, last=END)
+            self.flanec_size.insert(0, "150x150x5")
+        elif w1 >= 60 and w1 <= 100 and w2 >= 60 and w2 <= 100:
+            self.flanec_size.delete(0, last=END)
+            self.flanec_size.insert(0, "200x200x5")
+
+    def zagl_price_set(self, w1, w2):
+        try:
+            zaglushka = self.read("kalitka_kefyy.json")["zaglushki"][f"{str(w1)}x{str(w2)}"]
+            self.zagl_price.delete(0, last=END)
+            self.zagl_price.insert(0, f"{zaglushka}")
+            self.zagl_size.delete(0, last=END)
+            self.zagl_size.insert(0, f"{w1}x{w2}")
+        except KeyError:
+            self.zagl_price.delete(0, last=END)
+            self.zagl_size.delete(0, last=END)
+            self.zagl_amount.delete(0, last=END)
 
     def open_site_tube(self, event, w1, w2):
         foo = "https://www.spk.ru/catalog/metalloprokat/trubniy-prokat/truba-profilnaya/?rt02[]="

@@ -1,19 +1,51 @@
+import tkinter
 from tkinter import Tk, ttk, filedialog
 from PrPclasses import PrP
 from Tubes_classes_27_01 import Create_Tube
 from Kclasses import Create_kalitka
 from GateClasses import Create_gate
 
+
+"""Класс создаст окно где изменю данные выбранной строки"""
+class Change_row(tkinter.Toplevel):
+    def __init__(self, my_dict):
+        self.text_got = my_dict[0]
+        self.amount_got = my_dict[1]
+        self.summa_got = my_dict[2]
+
+        super().__init__()
+        self.text = tkinter.Entry(self, width=8)
+        self.text.pack()
+        self.text.insert(0, "{}".format(self.text_got))
+        self.amount = tkinter.Entry(self, width=8)
+        self.amount.pack()
+        self.amount.insert(0, "{}".format(self.amount_got))
+        self.summa = tkinter.Entry(self, width=8)
+        self.summa.pack()
+        self.summa.insert(0, "{}".format(self.summa_got))
+        self.destr_but = tkinter.Button(self, text="Закрыть", command=self.window_destr)
+        self.destr_but.pack()
+
+    def open(self):
+        self.grab_set()
+        self.wait_window()
+        return lst
+
+    def window_destr(self):
+        global lst
+        lst = [self.text.get(), self.amount.get(), self.summa.get()]
+        Change_row.destroy(self)
+
+
 class Main(Tk):
     def __init__(self):
         super().__init__()
         self.i = len(c)
-        self.tree = ttk.Treeview(columns=title, height=self.i,
-                                 show="headings")
-        self.tree.heading('1', text="Описание")
+        self.tree = ttk.Treeview(columns=title, height=self.i, show="headings")
+        self.tree.heading("1", text="Описание")
         self.tree.heading("2", text="Кол-во")
         self.tree.heading("3", text="Стоимость")
-        self.tree.column('1', minwidth=220, width=300, stretch=True)
+        self.tree.column('1', minwidth=220, width=400, stretch=True)
         self.tree.column('2', minwidth=70, width=70)
         self.tree.column('3', minwidth=70, width=70, )
         self.tree.grid(column=0, row=0, columnspan=6)
@@ -24,18 +56,28 @@ class Main(Tk):
         self.addTubes.grid(column=1, row=1)
         self.addKalitka = ttk.Button(self, text="Калитка", command=self.start_kalitka)
         self.addKalitka.grid(column=2, row=1)
-        self.addvr = ttk.Button(self, text="Калитка", command=self.start_vr)
-        self.addvr.grid(column=3, row=2)
+        self.addvr = ttk.Button(self, text="Ворота Р", command=self.start_vr)
+        self.addvr.grid(column=3, row=1)
 
         self.del_but = ttk.Button(self, text="Удалить", command=self.del_func).grid(column=4, row=1)
         self.sum_but = ttk.Button(self, text="Сумма", command=self.sum_func).grid(column=5, row=1)
-        # self.sum_labl_labl = ttk.Button(self, text="Сумма").grid(column=3, row=1)
         self.sum_labl = ttk.Label(self, text="")
         self.sum_labl.grid(column=4, row=2)
         self.save_but = ttk.Button(self, text="Сохранить", width=11, command=self.create_data)
         self.save_but.grid(column=0, row=2)
         self.load_but = ttk.Button(self, text="Открыть", command=self.open_data)
         self.load_but.grid(column=1, row=2)
+        self.change_amount = ttk.Button(self, text="Изменить", width=11, command=self.change_am)  # изменить строку
+        self.change_amount.grid(column=2, row=2)
+
+    def change_am(self):
+        get_dict = self.tree.focus()
+        my_dict = self.tree.item(get_dict)
+        a = Change_row(my_dict["values"])
+        b = a.open()
+        self.tree.delete(get_dict)
+        self.tree.insert("", "end", values=b)
+        self.tree.config(height=len(self.tree.get_children()))
 
     """нажимая кнопку сохранить я вызываю функцию, которая создаст переменную data, где будет храниться инфа
      для сохранения. А эта Ф после выполнения  вызывет Ф save_data(data) которая и сохранит в файл информацию.
@@ -72,12 +114,6 @@ class Main(Tk):
             data_insert = [text, amount, price]
             self.tree.insert('', 'end', values=data_insert)
             self.tree.config(height=len(self.tree.get_children()))
-
-
-        """    def func(self, *items):
-        for j in items:
-            self.tree.insert('', ttk.END, values=(j,))
-        self.tree.config(height=len(self.tree.get_children()))"""
 
     """Ф считает сумму всех строк в таблице последовательным извлечением строк, перемножением кол-ва на сумму, 
     добавлением всего в список. Пробежав по всей таблице суммирует ее и выводит в лейбле"""
@@ -117,21 +153,23 @@ class Main(Tk):
         {tbs["combo_w_2"]}: {tbs["width2_1"]}x{tbs["width2_2"]}x{tbs["thick2"]}. Фланец {tbs["flanec"]},
         {tbs["kosynka"]}
         """
-        people = [text, "12", "12"]
-        self.tree.insert('', "end", values=people)
+        result = [text, "12", "12"]
+        self.tree.insert('', "end", values=result)
         self.tree.config(height=len(self.tree.get_children()))
-        """results = {"combo_w_1": combo_w_1, "width1_1": width1_1, "width1_2": width1_2, "thick1": thickness1,
-                   "flanec": flanec_name, "kosynka": kosynka_name,
-                   "combo_w_2": combo_w_2, "width2_1": width2_1, "width2_2": width2_2, "thick2": thickness2}"""
-
-    def start_vr(self):
-        a = Create_gate()
-        tbs = a.open()
-
 
     def start_kalitka(self):
         a = Create_kalitka()
+        text, summa = a.open()
+        result = [text, 1, summa]
+        self.tree.insert("", "end", values=result)
+        self.tree.config(height=len(self.tree.get_children()))
 
+    def start_vr(self):
+        a = Create_gate()
+        text, summa = a.open()
+        result = [text, 1, summa]
+        self.tree.insert("", "end", values=result)
+        self.tree.config(height=len(self.tree.get_children()))
 
 if __name__ == "__main__":
     c = []
@@ -142,6 +180,10 @@ if __name__ == "__main__":
 """
 https://metanit.com/python/tkinter/4.1.php - работа с таблицами
 https://metanit.com/python/tkinter/5.3.php - сохр/откр файла
-
+https://www.piknad.ru/pytab3.php - редактор ячеек TreeView
 """
-
+"""
+1. ЧТобы получить словарь данных из выбранного мной на экране:
+a = self.tree.focus()
+print(self.tree.item(a)
+"""

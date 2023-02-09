@@ -355,6 +355,11 @@ class Create_gate(Tk):
         self.change_kefy = Button(self, width=13, text="Изменить КЭФы", command=self.kefy)
         self.change_kefy.grid(column=2, columnspan=2, row=23)
 
+    def open(self):
+        self.grab_set()
+        self.wait_window()
+        return results, summa_k_sale
+
     """Ф устанавливает размер и цену заглушки под профиль столба"""
     @staticmethod
     def zagl_set(event):
@@ -377,11 +382,6 @@ class Create_gate(Tk):
         elif w1 >= 60 and w1 <= 100 and w2 >=60 and w2 <= 100:
             self.flanec_size.delete(0, last=END)
             self.flanec_size.insert(0, "200x200x5")
-
-    def open(self):
-        self.grab_set()
-        self.wait_window()
-        return results
 
     def open_site_tube(self, event, w1, w2):
         foo = "https://www.spk.ru/catalog/metalloprokat/trubniy-prokat/truba-profilnaya/?rt02[]="
@@ -463,7 +463,7 @@ class Create_gate(Tk):
 
     def count(self):
         """Расчет стоимости столбов. Try обрабатывает событие если поступает '' пустой значение"""
-        global vars, results
+        global vars, results, summa_k_sale
 
         cena_tube_1 = (int(
             (self.database(str(self.width1_1.get()), str(self.width1_2.get()), self.chgtocomas(str(self.thick1.get()))))
@@ -525,6 +525,10 @@ class Create_gate(Tk):
         self.summa_seb_text.config(text=f"{summa_k_seb}")
         self.summa_sale_text.config(text=f"{summa_k_sale}")
         self.summa_text.config(text=f"{summa}")
+
+        results = f"""ВР {self.height_gate.get()}x{self.width_gate.get()} 
+        Столб {self.width1_1.get()}x{self.width1_2.get()}x{self.thick1.get()}x{self.length1.get()} 
+        Рама {self.shirina_ramy1_1.get()}x{self.shirina_ramy1_2}x{self.tolshina_ramy_1} Ural  """
 
     """Начальное заполнение окон по нажатию кнопки"""
     def to_fill(self):
@@ -596,7 +600,7 @@ class Create_gate(Tk):
         self.upor_price.delete(0, last=END)
         self.upor_price.insert(0, f"{cena}")
 
-        results = {}
+
 
 if __name__ == "__main__":
     a = Create_gate()

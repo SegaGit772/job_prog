@@ -3,6 +3,7 @@ import sqlite3
 import json
 from kefy_changing import Kef_changing
 import webbrowser
+from tkinter import scrolledtext as st
 
 
 class Details(Toplevel):
@@ -303,6 +304,8 @@ class Create_kalitka(Tk):
         self.ral_labl = Label(self, text="Краска", width=9, anchor=W).grid(column=0, row=19)
         self.ral_price = Entry(self, width=8)
         self.ral_price.grid(column=6, row=19)
+        self.ral_size = Entry(self, width=11)
+        self.ral_size.grid(column=4, row=19)
         self.ral_amount = Entry(self, width=8)
         self.ral_amount.grid(column=5, row=19)
         self.ral_amount.insert(0, "1")
@@ -339,6 +342,10 @@ class Create_kalitka(Tk):
         self.count_det_but.grid(column=2, columnspan=2, row=22)
         self.change_kefy = Button(self, width=13, text="Изменить КЭФы", command=self.kefy)
         self.change_kefy.grid(column=2, columnspan=2, row=23)
+
+        """Окно вывод результатов на главную страницу"""
+        self.result = st.ScrolledText(self, width=65, borderwidth=3, height=1, font=("Times New Roman", 10))
+        self.result.grid(column=0, row=28, columnspan=7, rowspan=2)
 
     def zagl_set(self, event):
         width1 = int(self.width1_1.get())
@@ -397,6 +404,11 @@ class Create_kalitka(Tk):
         with open(filename, "r", encoding="utf-8") as file:
             return json.load(file)
 
+    def open(self):
+        self.grab_set()
+        self.wait_window()
+        return results, summa_k_sale
+
     """Извлекаем данные из БД"""
     def database(self, width1, width2, thick):
         try:
@@ -437,7 +449,7 @@ class Create_kalitka(Tk):
 
     def count(self):
         """Расчет стоимости столбов. Try обрабатывает событие если поступает '' пустой значение"""
-        global vars
+        global vars, results, summa_k_sale
 
         cena_tube_1 = (int(
             (self.database(str(self.width1_1.get()), str(self.width1_2.get()), self.chgtocomas(str(self.thick1.get()))))
@@ -498,6 +510,12 @@ class Create_kalitka(Tk):
         self.summa_seb_text.config(text=f"{summa_k_seb}")
         self.summa_sale_text.config(text=f"{summa_k_sale}")
         self.summa_text.config(text=f"{summa}")
+
+        results = f"Калитка {self.height_kalitki.get()}x{self.width_kalitki.get()} Столб {self.width1_1.get()}x" \
+                  f"{self.width1_2.get()}x{self.thick1.get()}x{self.length1.get()} Рама {self.shirina_ramy1_1.get()}" \
+                  f"x{self.shirina_ramy1_2.get()}x{self.tolshina_ramy_1.get()}" \
+                  f"\n Ural RAL {self.ral_size.get()}"
+        self.result.insert(INSERT, results)
 
     """Начальное заполнение окон по нажатию кнопки"""
     def to_fill(self):

@@ -4,9 +4,12 @@ from PrPclasses import PrP
 from Tubes_classes_27_01 import Create_Tube
 from Kclasses import Create_kalitka
 from GateClasses import Create_gate
+from datetime import datetime
 
 
 """Класс создаст окно где изменю данные выбранной строки"""
+
+
 class Change_row(tkinter.Toplevel):
     def __init__(self, my_dict):
         self.text_got = my_dict[0]
@@ -174,9 +177,15 @@ class Main(Tk):
 if __name__ == "__main__":
     c = []
     title = ('1', "2", "3")
+    b = datetime.date(datetime.now())
+    g = "09/05/2023"
+    e = datetime.strptime(g, "%d/%m/%Y")
+    time_now = datetime.now()
+    if e < time_now:
+       raise Exception("Some exception")
     root = Main()
-    # root.geometry("600x100")
     root.mainloop()
+
 
 """
 https://metanit.com/python/tkinter/4.1.php - работа с таблицами

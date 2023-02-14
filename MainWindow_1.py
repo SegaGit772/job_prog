@@ -62,7 +62,7 @@ class Main(Tk):
         self.del_but = ttk.Button(self, text="Удалить", command=self.del_func).grid(column=4, row=1)
         self.sum_but = ttk.Button(self, text="Сумма", command=self.sum_func).grid(column=5, row=1)
         self.sum_labl = ttk.Label(self, text="")
-        self.sum_labl.grid(column=4, row=2)
+        self.sum_labl.grid(column=5, row=2)
         self.save_but = ttk.Button(self, text="Сохранить", width=11, command=self.create_data)
         self.save_but.grid(column=0, row=2)
         self.load_but = ttk.Button(self, text="Открыть", command=self.open_data)
@@ -175,6 +175,7 @@ if __name__ == "__main__":
     c = []
     title = ('1', "2", "3")
     root = Main()
+    # root.geometry("600x100")
     root.mainloop()
 
 """

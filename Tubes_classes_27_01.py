@@ -6,6 +6,27 @@ import webbrowser
 from Kclasses import Density_set_class
 
 
+text = """
+Программа считает противоподкопную решетку. \n
+1. Подсчет профильных труб:\n
+выберите "Прямоуг", выставьте размеры трубы (60 60)\n
+2. Подсчет уголков:\n
+выберите "Уголки", выставьте размеры (50, 50)\n
+3. Подсчет круглых труб:\n
+выберите "Круглые", выставьте размеры (51, 0)\n
+"""
+
+
+class Ref(Tk):
+    def __init__(self):
+        super().__init__()
+        self.title("Справка по трубам")
+        self.geometry("350x200")
+        self.labl = Label(self, text=f"{text}", justify=LEFT, width=53)
+        self.labl.grid(column=0, row=0)
+        self.but = Button(self, text="закрыть", command=self.destroy)
+        self.but.grid(column=0, row=1)
+
 class Details(Toplevel):
     def __init__(self, parent, vars):
         super().__init__(parent)
@@ -62,6 +83,11 @@ class Create_Tube(Tk):
         super().__init__()
         self.title("Опоры")
         # если например в text не указать self то этот объект создастся в окне main2
+
+        """Создаем меню-справки"""
+        self.mainmenu = Menu(self)  # создаем экземпляр классе меню и привязываем к виджету, где будет использ.
+        self.config(menu=self.mainmenu)  # его опции меню присваивается экземпляр Menu
+        self.mainmenu.add_command(label="Справка", command=self.reference)
 
         """Шапка"""
         self.width1_labl = Label(self, text='Большая').grid(column=1, row=1)
@@ -200,6 +226,9 @@ class Create_Tube(Tk):
         self.k_seb.grid(column=2, columnspan=2, row=22)
         self.k_sale = Spinbox(self, from_=1.85, to=22, increment=0.01, width=8)
         self.k_sale.grid(column=2, columnspan=2, row=23)
+
+    def reference(self):
+        instance = Ref()
 
     def open_site_tube(self, event, w1, w2):
         foo = "https://www.spk.ru/catalog/metalloprokat/trubniy-prokat/truba-profilnaya/?rt02[]="

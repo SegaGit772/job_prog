@@ -526,9 +526,9 @@ class Create_gate(Tk):
         self.summa_sale_text.config(text=f"{summa_k_sale}")
         self.summa_text.config(text=f"{summa}")
 
-        results = f"""ВР {self.height_gate.get()}x{self.width_gate.get()} 
-        Столб {self.width1_1.get()}x{self.width1_2.get()}x{self.thick1.get()}x{self.length1.get()} 
-        Рама {self.shirina_ramy1_1.get()}x{self.shirina_ramy1_2}x{self.tolshina_ramy_1} Ural  """
+        results = f"ВР {self.height_gate.get()}x{self.width_gate.get()} Столб {self.width1_1.get()}x" \
+                  f"{self.width1_2.get()}x{self.thick1.get()}x{self.length1.get()}" \
+        f"Рама {self.shirina_ramy1_1.get()}x{self.shirina_ramy1_2.get()}x{self.tolshina_ramy_1.get()} Ural "
 
     """Начальное заполнение окон по нажатию кнопки"""
     def to_fill(self):

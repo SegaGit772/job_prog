@@ -10,6 +10,23 @@ dict = {'500x2500-150x150': 19.1, '500x3100-150x150': 24.2, '500x3000-150x150': 
         '300x3100-150x150': 16.1, '300x3000-150x150': 15.5, '300x2500-150x150': 15.5,
         '750x1000-150x150': 10.6, '750x2300-150x150': 24.4}
 
+text = """
+Программа считает противоподкопную решетку. \n
+1. Коэффициенты пр-ва (производства) и пр-жи(продажи) загружаются\n 
+каждый раз из базы данных. Если Кэфы изменятся на постоянной основе,\n
+подправьте в приложении и нажмите кнопку "S", так вы перезапишите данные.
+"""
+
+class Ref(Tk):
+    def __init__(self):
+        super().__init__()
+        self.title("Справка по ПрП")
+        self.geometry("500x200")
+        self.labl = Label(self, text=f"{text}", justify=LEFT, width=63)
+        self.labl.grid(column=0, row=0)
+        self.but = Button(self, text="закрыть", command=self.destroy)
+        self.but.grid(column=0, row=1)
+
 
 class PrP(Toplevel):
 
@@ -85,16 +102,25 @@ class PrP(Toplevel):
         self.armamm.grid(column=0, row=6)
         self.fencecost = Label(self, text="Цена секции", anchor='w', width=16)
         self.fencecost.grid(column=0, row=7)
-        self.fencecostprva = Label(self, text="Цена с К. пр-ва")
-        self.fencecostprva.grid(column=1, row=7)
-        self.fencecostsale = Label(self, text="Р цена продажи")
-        self.fencecostsale.grid(column=1, row=8)
+        self.fencecostprva = Label(self, text="Цена с Коэф. пр-ва")
+        self.fencecostprva.grid(column=1, row=7, columnspan=2)
+        self.fencecostsale = Label(self, text="Рекоменд цена продажи")
+        self.fencecostsale.grid(column=1, row=8, columnspan=2)
         self.fencecostpm = Label(self, text="Цена м.пог", anchor='w', width=16)
         self.fencecostpm.grid(column=0, row=8)
         self.costnsec = Label(self, text=f'Цена n секций', anchor='w', width=17)
         self.costnsec.grid(column=0, row=9)
         self.buttonKprS = Button(self, text='S', command=self.kprS, wraplength=1)
         self.buttonKprS.grid(column=5, row=5)
+
+        """Создаем меню-справки"""
+        self.mainmenu = Menu(self)  # создаем экземпляр классе меню и привязываем к виджету, где будет использ.
+        self.config(menu=self.mainmenu)  # его опции меню присваивается экземпляр Menu
+        self.mainmenu.add_command(label="Справка", command=self.reference)
+
+    def reference(self):
+        instance = Ref()
+
 
     def read(self, filename):
         with open(filename, 'r', encoding='utf-8') as file:
@@ -172,3 +198,10 @@ if __name__ == "__main__":
     prp = PrP()
     prp.mainloop()
 
+"""Справка
+1. Если вторым окном создать Toplevel, то мы не сможем пользоваться кнопками этого окна, даже закрыть не сможем.
+Для этого необходимо перехватить ввод. Сразу после создания класса нового окна ввести
+self.grab_set() -   захватываем весь пользовательский ввод
+и можно пользоваться окном. Но тогда блокируется основное окно. Значит проще вторым окном создать Tk окно
+
+"""

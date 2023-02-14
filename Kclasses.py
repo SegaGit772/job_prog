@@ -5,6 +5,21 @@ from kefy_changing import Kef_changing
 import webbrowser
 from tkinter import scrolledtext as st
 
+text = """
+Заполните Высоту и ширину калитки, жмите Заполнить.\n
+
+"""
+
+class Ref(Tk):
+    def __init__(self):
+        super().__init__()
+        self.title("Справка по Калиткам")
+        self.geometry("350x200")
+        self.labl = Label(self, text=f"{text}", justify=LEFT, width=53)
+        self.labl.grid(column=0, row=0)
+        self.but = Button(self, text="закрыть", command=self.destroy)
+        self.but.grid(column=0, row=1)
+
 
 class Details(Toplevel):
     def __init__(self, parent, vars):
@@ -346,6 +361,9 @@ class Create_kalitka(Tk):
         """Окно вывод результатов на главную страницу"""
         self.result = st.ScrolledText(self, width=65, borderwidth=3, height=1, font=("Times New Roman", 10))
         self.result.grid(column=0, row=28, columnspan=7, rowspan=2)
+
+    def reference(self):
+        ref = Ref()
 
     def zagl_set(self, event):
         width1 = int(self.width1_1.get())
